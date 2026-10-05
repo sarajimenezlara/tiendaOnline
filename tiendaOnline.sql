@@ -21,15 +21,6 @@ CREATE TABLE IF NOT EXISTS producto (
     descripcion TEXT
 );
 
-CREATE TABLE IF NOT EXISTS carrito (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    producto_id INT NOT NULL,
-    cantidad INT NOT NULL DEFAULT 1,
-    FOREIGN KEY (user_id) REFERENCES user(id),
-    FOREIGN KEY (producto_id) REFERENCES producto(id)
-);
-
 CREATE TABLE IF NOT EXISTS pedido (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -39,7 +30,7 @@ CREATE TABLE IF NOT EXISTS pedido (
     FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
-CREATE TABLE IF NOT EXISTS detalle_pedido (
+CREATE TABLE IF NOT EXISTS linea_pedido (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pedido_id INT NOT NULL,
     producto_id INT NOT NULL,
