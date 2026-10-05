@@ -4,17 +4,25 @@ require_once 'models/Product.php';
 require_once 'models/Linea_pedido.php';
 require_once 'models/Pedido.php';
 require_once 'models/User.php';
-
 class MainController {
-
+    
     public function index() {
         $products = Product::getAll();
         require_once 'views/mainView.phtml';
     }
 
     public function login() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $user = User::login($_POST['nombre'], $_POST['contraseña']);
+            if ($user) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_nombre'] = $user['nombre'];
+                header('Location: index.php?action=index');
+            } else {
+                echo "Nombre o contraseña incorrectos";
+            }
+        }
         require_once 'views/loginView.phtml';
-        require_once 'models/User.php';
     }
 
     public function productos() {
@@ -36,7 +44,27 @@ class MainController {
         $pedido = Pedido::getById($pedido_id);
         require_once 'views/confirmacionView.phtml';
     }
+    public function logout() {
+        session_destroy();
+        header('Location: index.php?action=index');
+    }
+
     public function register() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $result = User::register(
+                $_POST['nombre'],
+                '',
+                $_POST['contraseña']
+            );
+            
+            if ($result) {
+                $_SESSION['user_id'] = $result;
+                $_SESSION['user_nombre'] = $_POST['nombre'];
+                header('Location: index.php?action=index');
+            } else {
+                echo "Error: el nombre de usuario ya existe";
+            }
+        }
         require_once 'views/registerView.phtml';
     }
 }

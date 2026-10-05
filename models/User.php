@@ -105,4 +105,43 @@ class User
     {
         $this->direccion = $direccion;
     }
+
+    public static function login($nombre, $contraseña) {
+        $conectar = db::connect();
+        $stmt = $conectar->prepare("SELECT * FROM user WHERE nombre = ?");
+        $stmt->bind_param("s", $nombre);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+        
+        if ($user && password_verify($contraseña, $user['contraseña'])) {
+            return $user;
+        }
+        return false;
+    }
+
+    public static function register($nombre, $apellidos, $contraseña, $telefono = null, $metodo_pago = null, $direccion = null) {
+        $conectar = db::connect();
+        
+        // Verificar si el nombre ya existe
+        $stmt = $conectar->prepare("SELECT id FROM user WHERE nombre = ?");
+        $stmt->bind_param("s", $nombre);
+        $stmt->execute();
+        if ($stmt->get_result()->fetch_assoc()) {
+            return false; // El usuario ya existe
+        }
+        
+        // Cifrar la contraseña
+        $hash = password_hash($contraseña, PASSWORD_DEFAULT);
+        
+        // Insertar el nuevo usuario
+        $stmt = $conectar->prepare("INSERT INTO user (nombre, apellidos, correo, contraseña, telefono, metodo_pago, direccion) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $correo = ""; // Por ahora vacío
+        $stmt->bind_param("sssssss", $nombre, $apellidos, $correo, $hash, $telefono, $metodo_pago, $direccion);
+        
+        if ($stmt->execute()) {
+            return $conectar->insert_id; // Devuelve el id del nuevo usuario
+        }
+        return false;
+    }
 }
