@@ -1,7 +1,7 @@
 <?php
 require_once 'views/mainView.phtml';
 require_once 'models/Product.php';
-require_once 'models/Detalle_pedido.php';
+require_once 'models/Linea_pedido.php';
 require_once 'models/Pedido.php';
 require_once 'models/User.php';
 
