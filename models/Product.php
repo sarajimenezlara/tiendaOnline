@@ -79,7 +79,6 @@ class Producto
         $this->descripcion = $descripcion;
     }
 }
-=======
 class Product {
     private $id;
     private $nombre;

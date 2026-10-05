@@ -5,19 +5,25 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Main View</title>
+        <title>Tienda Online</title>
     </head>
     <body>
-        <?php 
-        if (!isset($_GET['action']) || $_GET['action'] !== 'register') {
-            require_once 'loginView.phtml';
-            $registrarse = '<a href="index.php?action=register"><button>Registrarse</button></a>';
-            echo '<br>';
-            echo '<label for="nombre">No tienes sesion creada?, creala  </label>';
-            echo '<br>';
-            echo '<br>';
-            echo $registrarse;
-        }
-        ?>
-        
+        <nav>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <span>Hola, <?= htmlspecialchars($_SESSION['user_nombre']) ?></span>
+                <a href="index.php?action=logout"><button>Logout</button></a>
+            <?php else: ?>
+                <h1>Tienda Online</h1>
+                <a href="index.php?action=login"><button>Iniciar sesión</button></a>
+                <a href="index.php?action=register"><button>Registrarse</button></a>
+            <?php endif; ?>
+        </nav>
+        <?php foreach ($products as $product): ?>
+            <div>
+                <h3><?= htmlspecialchars($product['nombre']) ?></h3>
+                <p><?= htmlspecialchars($product['descripcion']) ?></p>
+                <p>Precio: <?= htmlspecialchars($product['precio']) ?>€</p>
+            </div>
+        <?php endforeach; ?>
     </body>
+</html>

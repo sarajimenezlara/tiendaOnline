@@ -1,4 +1,5 @@
 <?php
+session_start();
 $env = parse_ini_file(".env");
 foreach ($env as $key => $value) {
     putenv("$key=$value");
@@ -17,6 +18,9 @@ switch ($action) {
         break;
     case 'login':
         $controller->login();
+        break;
+    case 'logout':
+        $controller->logout();
         break;
     case 'register':
         $controller->register();
