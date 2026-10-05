@@ -36,5 +36,8 @@ class MainController {
         $pedido = Pedido::getById($pedido_id);
         require_once 'views/confirmacionView.phtml';
     }
+    public function register() {
+        require_once 'views/registerView.phtml';
+    }
 }
 ?>

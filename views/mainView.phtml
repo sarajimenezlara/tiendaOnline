@@ -9,18 +9,15 @@
     </head>
     <body>
         <?php 
-        require_once 'loginView.phtml';
-        $registrarse = '<input type="submit" value="Registrarse">';
-        echo '<form method="POST" action="index.php">';
-        echo '<br>';
-        echo '<label for="nombre">No tienes sesion creada?, creala  </label>';
-        echo '<br>';
-        echo '<br>';
-        echo $registrarse;
-        if (isset($_POST['registrarse'])) {
-            require_once 'registerView.phtml';
+        if (!isset($_GET['action']) || $_GET['action'] !== 'register') {
+            require_once 'loginView.phtml';
+            $registrarse = '<a href="index.php?action=register"><button>Registrarse</button></a>';
+            echo '<br>';
+            echo '<label for="nombre">No tienes sesion creada?, creala  </label>';
+            echo '<br>';
+            echo '<br>';
+            echo $registrarse;
         }
-        echo '</form>';
         ?>
         
     </body>
