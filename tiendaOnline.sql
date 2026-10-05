@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS pedido (
     FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
-CREATE TABLE IF NOT EXISTS detalle_pedido (
+CREATE TABLE IF NOT EXISTS linea_pedido (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pedido_id INT NOT NULL,
     producto_id INT NOT NULL,
