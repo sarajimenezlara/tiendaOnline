@@ -1,22 +1,34 @@
 <?php
-require_once 'models/Product.php';
-require_once 'models/Linea_pedido.php';
-require_once 'models/Pedido.php';
-require_once 'models/User.php';
+require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../models/ProductRepository.php';
+require_once __DIR__ . '/../models/UserRepository.php';
+require_once __DIR__ . '/../models/OrderRepository.php';
+require_once __DIR__ . '/../models/OrderLineRepository.php';
+
 class MainController {
+    private ProductRepository $productRepo;
+    private UserRepository $userRepo;
+    private OrderRepository $orderRepo;
+
+    public function __construct() {
+        $this->productRepo = new ProductRepository();
+        $this->userRepo = new UserRepository();
+        $this->orderRepo = new OrderRepository();
+    }
     
     public function index() {
-        $products = Product::getAll();
+        $products = $this->productRepo->getAll();
         require_once 'views/mainView.phtml';
     }
 
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $user = User::login($_POST['nombre'], $_POST['contraseña']);
-            if ($user) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_nombre'] = $user['nombre'];
+            $userRow = $this->userRepo->getUserByUsername($_POST['nombre']);
+            if ($userRow && password_verify($_POST['contraseña'], $userRow['password'])) {
+                $_SESSION['user_id'] = $userRow['id'];
+                $_SESSION['user_nombre'] = $userRow['nombre'];
                 header('Location: index.php?action=index');
+                exit();
             } else {
                 echo "Nombre o contraseña incorrectos";
             }
@@ -31,17 +43,15 @@ class MainController {
         }
         if (isset($_GET['add'])) {
             if (isset($_POST['name']) && isset($_POST['description']) && isset($_POST['stock']) && isset($_POST['price'])) {
-                $conn = db::connect();
-                $stmt = $conn->prepare('INSERT INTO producto (nombre, categoria, stock, precio, descripcion) VALUES (?, ?, ?, ?, ?)');
-                $nombre = $_POST['name'];
-                $categoria = $_POST['categoria'] ?? 'general';
-                $stock = (int)$_POST['stock'];
-                $precio = (float)$_POST['price'];
-                $descripcion = $_POST['description'];
-                $stmt->bind_param('ssids', $nombre, $categoria, $stock, $precio, $descripcion);
-                $stmt->execute();
-                $stmt->close();
-                $conn->close();
+                $producto = new Producto(
+                    0,
+                    $_POST['name'],
+                    $_POST['categoria'] ?? 'General',
+                    (int)$_POST['stock'],
+                    (float)$_POST['price'],
+                    $_POST['description']
+                );
+                $this->productRepo->create($producto);
                 header('Location: index.php?action=productos');
                 exit();
             } else {
@@ -49,43 +59,57 @@ class MainController {
                 exit();
             }
         }
-        $products = Product::getAll();
+        $products = $this->productRepo->getAll();
         require_once 'views/productosView.phtml';
     }
 
     public function verProducto($id) {
-        $product = Product::getById($id);
+        $product = $this->productRepo->getById((int)$id);
         require_once 'views/verProductoView.phtml';
     }
 
     public function comprar() {
-        $pedido_id = Pedido::create($_SESSION['user_id']);
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: index.php?action=login');
+            exit();
+        }
+        $pedido_id = $this->orderRepo->create((int)$_SESSION['user_id'], 0.0, 'pendiente');
         header('Location: index.php?action=confirmacion&id=' . $pedido_id);
+        exit();
     }
 
     public function confirmacion($pedido_id) {
-        $pedido = Pedido::getById($pedido_id);
+        $pedido = $this->orderRepo->getById((int)$pedido_id);
         require_once 'views/confirmacionView.phtml';
     }
+
     public function logout() {
         session_destroy();
         header('Location: index.php?action=index');
+        exit();
     }
 
     public function register() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $result = User::register(
-                $_POST['nombre'],
-                '',
-                $_POST['contraseña']
-            );
-            
-            if ($result) {
-                $_SESSION['user_id'] = $result;
-                $_SESSION['user_nombre'] = $_POST['nombre'];
-                header('Location: index.php?action=index');
+            $nombre = trim($_POST['nombre']);
+            $contraseña = $_POST['contraseña'];
+            $apellidos = $_POST['apellidos'] ?? '';
+            $correo = $_POST['correo'] ?? ($nombre . '@local.test');
+
+            // Comprobar si el usuario ya existe usando UserRepository
+            if ($this->userRepo->getUserByUsername($nombre) || $this->userRepo->getByCorreo($correo)) {
+                echo "Error: el nombre de usuario o correo ya existe";
             } else {
-                echo "Error: el nombre de usuario ya existe";
+                $user = new User(0, $nombre, $apellidos, $correo, $contraseña);
+                $nuevoId = $this->userRepo->create($user);
+                if ($nuevoId) {
+                    $_SESSION['user_id'] = $nuevoId;
+                    $_SESSION['user_nombre'] = $nombre;
+                    header('Location: index.php?action=index');
+                    exit();
+                } else {
+                    echo "Error al registrar el usuario.";
+                }
             }
         }
         require_once 'views/registerView.phtml';

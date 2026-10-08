@@ -8,11 +8,19 @@ foreach ($env as $key => $value) {
 require_once("db.php");
 require_once ("controllers/mainController.php");
 
+if (isset($_GET['c']) && $_GET['c'] === 'order') {
+    require_once("controllers/orderController.php");
+    exit;
+}
+
 $controller = new MainController();
 
 $action = isset($_GET['action']) ? $_GET['action'] : 'index';
 
 switch ($action) {
+    case 'order':
+        require_once("controllers/orderController.php");
+        break;
     case 'index':
         $controller->index();
         break;

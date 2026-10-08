@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Pedido</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav>
+        <h1>Tienda Online</h1>
+        <?php if (isset($_SESSION['user_nombre'])): ?>
+            <span>Hola, <?= htmlspecialchars($_SESSION['user_nombre']) ?></span>
+            <a href="index.php?action=logout"><button>Logout</button></a>
+        <?php endif; ?>
+        <a href="index.php?action=productos&view=1"><button>Productos</button></a>
+    </nav>
+
+    <h2>Confirmación de Pedido</h2>
+
+    <?php if ($pedido): ?>
+        <div>
+            <h3>¡Gracias por tu pedido #<?= $pedido->getId() ?>!</h3>
+            <p><strong>Estado:</strong> <?= htmlspecialchars($pedido->getEstado()) ?></p>
+            <p><strong>Fecha:</strong> <?= $pedido->getFecha()->format('d/m/Y H:i') ?></p>
+            <p><strong>Total:</strong> <?= number_format($pedido->getPrecioTotal(), 2) ?>€</p>
+        </div>
+    <?php else: ?>
+        <p>No se pudo encontrar la información del pedido.</p>
+    <?php endif; ?>
+
+    <br>
+    <a href="index.php?action=index"><button>Volver al inicio</button></a>
+</body>
+</html>

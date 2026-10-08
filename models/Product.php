@@ -1,5 +1,5 @@
 <?php
-class Producto
+class Producto implements ArrayAccess
 {
     private int $id;
     private string $nombre;
@@ -78,6 +78,39 @@ class Producto
     {
         $this->descripcion = $descripcion;
     }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return in_array($offset, ['id', 'nombre', 'categoria', 'stock', 'precio', 'descripcion']);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        return match($offset) {
+            'id' => $this->id,
+            'nombre' => $this->nombre,
+            'categoria' => $this->categoria,
+            'stock' => $this->stock,
+            'precio' => $this->precio,
+            'descripcion' => $this->descripcion,
+            default => null
+        };
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        match($offset) {
+            'id' => $this->id = (int)$value,
+            'nombre' => $this->nombre = (string)$value,
+            'categoria' => $this->categoria = (string)$value,
+            'stock' => $this->stock = (int)$value,
+            'precio' => $this->precio = (float)$value,
+            'descripcion' => $this->descripcion = $value,
+            default => null
+        };
+    }
+
+    public function offsetUnset(mixed $offset): void {}
 }
 class Product {
     private $id;

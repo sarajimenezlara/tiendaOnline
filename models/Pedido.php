@@ -1,6 +1,6 @@
 <?php
 
-class Pedido
+class Pedido implements ArrayAccess
 {
     private int $id;
     private int $user_id;
@@ -21,6 +21,36 @@ class Pedido
         $this->estado = $estado;
         $this->precio_total = $precio_total;
     }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return in_array($offset, ['id', 'user_id', 'fecha', 'estado', 'precio_total']);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        return match($offset) {
+            'id' => $this->id,
+            'user_id' => $this->user_id,
+            'fecha' => $this->fecha,
+            'estado' => $this->estado,
+            'precio_total' => $this->precio_total,
+            default => null
+        };
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        match($offset) {
+            'id' => $this->id = (int)$value,
+            'user_id' => $this->user_id = (int)$value,
+            'estado' => $this->estado = (string)$value,
+            'precio_total' => $this->precio_total = (float)$value,
+            default => null
+        };
+    }
+
+    public function offsetUnset(mixed $offset): void {}
 
     public function getId(): int
     {
