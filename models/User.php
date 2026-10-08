@@ -109,10 +109,16 @@ class User
     public static function login($nombre, $contraseña) {
         $conectar = db::connect();
         $stmt = $conectar->prepare("SELECT * FROM user WHERE nombre = ?");
+        if (!$stmt) {
+            $conectar->close();
+            return false;
+        }
         $stmt->bind_param("s", $nombre);
         $stmt->execute();
         $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
+        $user = $result ? $result->fetch_assoc() : null;
+        $stmt->close();
+        $conectar->close();
         
         if ($user && password_verify($contraseña, $user['contraseña'])) {
             return $user;
@@ -120,28 +126,62 @@ class User
         return false;
     }
 
-    public static function register($nombre, $apellidos, $contraseña, $telefono = null, $metodo_pago = null, $direccion = null) {
+    public static function register($nombre, $apellidos, $contraseña, $correo = null, $telefono = null, $metodo_pago = null, $direccion = null) {
         $conectar = db::connect();
+
+        if (empty($correo)) {
+            $correo = $nombre . '@local.test';
+        }
         
         // Verificar si el nombre ya existe
         $stmt = $conectar->prepare("SELECT id FROM user WHERE nombre = ?");
+        if (!$stmt) {
+            $conectar->close();
+            return false;
+        }
         $stmt->bind_param("s", $nombre);
         $stmt->execute();
         if ($stmt->get_result()->fetch_assoc()) {
+            $stmt->close();
+            $conectar->close();
             return false; // El usuario ya existe
         }
+        $stmt->close();
+
+        // Verificar si el correo ya existe (columna UNIQUE)
+        $stmt = $conectar->prepare("SELECT id FROM user WHERE correo = ?");
+        if (!$stmt) {
+            $conectar->close();
+            return false;
+        }
+        $stmt->bind_param("s", $correo);
+        $stmt->execute();
+        if ($stmt->get_result()->fetch_assoc()) {
+            $stmt->close();
+            $conectar->close();
+            return false; // El correo ya existe
+        }
+        $stmt->close();
         
         // Cifrar la contraseña
         $hash = password_hash($contraseña, PASSWORD_DEFAULT);
         
         // Insertar el nuevo usuario
         $stmt = $conectar->prepare("INSERT INTO user (nombre, apellidos, correo, contraseña, telefono, metodo_pago, direccion) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $correo = ""; // Por ahora vacío
+        if (!$stmt) {
+            $conectar->close();
+            return false;
+        }
         $stmt->bind_param("sssssss", $nombre, $apellidos, $correo, $hash, $telefono, $metodo_pago, $direccion);
         
         if ($stmt->execute()) {
-            return $conectar->insert_id; // Devuelve el id del nuevo usuario
+            $id = $conectar->insert_id;
+            $stmt->close();
+            $conectar->close();
+            return $id; // Devuelve el id del nuevo usuario
         }
+        $stmt->close();
+        $conectar->close();
         return false;
     }
 }
