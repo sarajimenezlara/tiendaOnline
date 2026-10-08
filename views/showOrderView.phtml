@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Carrito / Pedido</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav>
+        <h1>Tienda Online</h1>
+        <?php if (isset($_SESSION['user_nombre'])): ?>
+            <span>Hola, <?= htmlspecialchars($_SESSION['user_nombre']) ?></span>
+            <a href="index.php?action=logout"><button>Logout</button></a>
+        <?php endif; ?>
+        <a href="index.php?action=productos&view=1"><button>Ver Productos</button></a>
+    </nav>
+
+    <h2>Tu Carrito de la Compra</h2>
+
+    <?php if (isset($_GET['success'])): ?>
+        <div style="background: #e6f4ea; border: 1px solid #34a853; padding: 10px; border-radius: 6px; margin-bottom: 12px;">
+            <p style="color: #137333; margin: 0; font-weight: bold;">¡Pedido completado con éxito! Gracias por tu compra.</p>
+        </div>
+    <?php endif; ?>
+
+    <?php if (empty($lineas)): ?>
+        <p>Tu carrito está vacío.</p>
+        <a href="index.php?action=productos&view=1"><button>Ir a comprar productos</button></a>
+    <?php else: ?>
+        <?php 
+            $productRepo = new ProductRepository();
+        ?>
+        <?php foreach ($lineas as $linea): ?>
+            <?php $prod = $productRepo->getById($linea->getProductoId()); ?>
+            <div>
+                <h3><?= $prod ? htmlspecialchars($prod->getNombre()) : 'Producto #' . $linea->getProductoId() ?></h3>
+                <p>Cantidad: <?= $linea->getCantidad() ?></p>
+                <p>Precio unitario: <?= number_format($linea->getPrecioUnitario(), 2) ?>€</p>
+                <p><strong>Subtotal: <?= number_format($linea->getSubtotal(), 2) ?>€</strong></p>
+            </div>
+        <?php endforeach; ?>
+
+        <div>
+            <h3>Total: <?= number_format($order->getPrecioTotal(), 2) ?>€</h3>
+            <a href="index.php?action=productos&view=1"><button>Seguir comprando</button></a>
+            <a href="index.php?c=order&checkout=1"><button>Finalizar compra</button></a>
+        </div>
+    <?php endif; ?>
+</body>
+</html>

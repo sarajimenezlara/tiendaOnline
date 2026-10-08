@@ -13,14 +13,16 @@
             <?php if (isset($_SESSION['user_id'])): ?>
                 <span>Hola, <?= htmlspecialchars($_SESSION['user_nombre']) ?></span>
                 <a href="index.php?action=logout"><button>Logout</button></a>
-        <h1>Productos disponibles:</h1>
-            <a href="index.php?action=productos&view=1"><button>Ver Producto</button></a>
-    </body>
+                <a href="index.php?c=order&show=1"><button>Ver Carrito</button></a>
             <?php else: ?>
                 <h1>Tienda Online</h1>
                 <a href="index.php?action=login"><button>Iniciar sesión</button></a>
                 <a href="index.php?action=register"><button>Registrarse</button></a>
             <?php endif; ?>
         </nav>
-        
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <h1>Productos disponibles:</h1>
+            <a href="index.php?action=productos&view=1"><button>Ver Productos</button></a>
+        <?php endif; ?>
+    </body>
 </html>

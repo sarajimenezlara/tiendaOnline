@@ -1,6 +1,6 @@
 <?php
 
-class User
+class User implements ArrayAccess
 {
     private int $id;
     private string $nombre;
@@ -30,6 +30,43 @@ class User
         $this->metodo_pago = $metodo_pago;
         $this->direccion = $direccion;
     }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return in_array($offset, ['id', 'nombre', 'apellidos', 'correo', 'contraseña', 'telefono', 'metodo_pago', 'direccion']);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        return match($offset) {
+            'id' => $this->id,
+            'nombre' => $this->nombre,
+            'apellidos' => $this->apellidos,
+            'correo' => $this->correo,
+            'contraseña' => $this->contraseña,
+            'telefono' => $this->telefono,
+            'metodo_pago' => $this->metodo_pago,
+            'direccion' => $this->direccion,
+            default => null
+        };
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        match($offset) {
+            'id' => $this->id = (int)$value,
+            'nombre' => $this->nombre = (string)$value,
+            'apellidos' => $this->apellidos = (string)$value,
+            'correo' => $this->correo = (string)$value,
+            'contraseña' => $this->contraseña = (string)$value,
+            'telefono' => $this->telefono = $value,
+            'metodo_pago' => $this->metodo_pago = $value,
+            'direccion' => $this->direccion = $value,
+            default => null
+        };
+    }
+
+    public function offsetUnset(mixed $offset): void {}
 
     public function getId(): int
     {
