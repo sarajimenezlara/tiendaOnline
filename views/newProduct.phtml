@@ -1,0 +1,21 @@
+<?php
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php?action=login');
+    exit();
+}
+?>
+<form action="index.php?action=productos&add=1" method="POST">
+    <label for="name">Nombre:</label>
+    <input type="text" name="name" id="name" required>
+    
+    <label for="description">Descripción:</label>
+    <textarea name="description" id="description" required></textarea>
+    
+    <label for="stock">Stock:</label>
+    <input type="number" name="stock" id="stock" required>
+    
+    <label for="price">Precio:</label>
+    <input type="number" name="price" id="price" step="0.01" required>
+    
+    <button type="submit">Agregar Producto</button>
+</form>
