@@ -12,19 +12,14 @@
             <?php if (isset($_SESSION['user_id'])): ?>
                 <span>Hola, <?= htmlspecialchars($_SESSION['user_nombre']) ?></span>
                 <a href="index.php?action=logout"><button>Logout</button></a>
-        <a href="index.php?action=productos&new=1"><button>Nuevo Producto</button></a>
+        <h1>Productos disponibles:</h1>
+            <a href="index.php?action=productos&view=1"><button>Ver Producto</button></a>
+    </body>
             <?php else: ?>
                 <h1>Tienda Online</h1>
                 <a href="index.php?action=login"><button>Iniciar sesión</button></a>
                 <a href="index.php?action=register"><button>Registrarse</button></a>
             <?php endif; ?>
         </nav>
-        <?php foreach ($products as $product): ?>
-            <div>
-                <h3><?= htmlspecialchars($product['nombre']) ?></h3>
-                <p><?= htmlspecialchars($product['descripcion']) ?></p>
-                <p>Precio: <?= htmlspecialchars($product['precio']) ?>€</p>
-            </div>
-        <?php endforeach; ?>
-    </body>
+        
 </html>
