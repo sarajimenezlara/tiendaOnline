@@ -61,4 +61,41 @@ class Pedido
     {
         $this->precio_total = $precio_total;
     }
+
+    public static function create(int $user_id, float $precio_total = 0, string $estado = 'pendiente'): int|false
+    {
+        $conectar = db::connect();
+        $stmt = $conectar->prepare('INSERT INTO pedido (user_id, estado, precio_total) VALUES (?, ?, ?)');
+        if (!$stmt) {
+            $conectar->close();
+            return false;
+        }
+        $stmt->bind_param('isd', $user_id, $estado, $precio_total);
+        if (!$stmt->execute()) {
+            $stmt->close();
+            $conectar->close();
+            return false;
+        }
+        $id = $conectar->insert_id;
+        $stmt->close();
+        $conectar->close();
+        return $id;
+    }
+
+    public static function getById(int $id): ?array
+    {
+        $conectar = db::connect();
+        $stmt = $conectar->prepare('SELECT * FROM pedido WHERE id = ?');
+        if (!$stmt) {
+            $conectar->close();
+            return null;
+        }
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result ? $result->fetch_assoc() : null;
+        $stmt->close();
+        $conectar->close();
+        return $row ?: null;
+    }
 }

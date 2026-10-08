@@ -92,31 +92,50 @@ class Product {
         $sql = "SELECT * FROM producto";
         $result = $conectar->query($sql);
         $products = [];
-        while ($row = $result->fetch_assoc()) {
-            $products[] = $row;
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $products[] = $row;
+            }
+            $result->free();
         }
+        $conectar->close();
         return $products;
     }
 
     public static function getById($id) {
         $conectar = db::connect();
         $stmt = $conectar->prepare("SELECT * FROM producto WHERE id = ?");
+        if (!$stmt) {
+            $conectar->close();
+            return null;
+        }
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
-        return $result->fetch_assoc();
+        $row = $result ? $result->fetch_assoc() : null;
+        $stmt->close();
+        $conectar->close();
+        return $row ?: null;
     }
 
     public static function getByCategory($categoria) {
         $conectar = db::connect();
         $stmt = $conectar->prepare("SELECT * FROM producto WHERE categoria = ?");
+        if (!$stmt) {
+            $conectar->close();
+            return [];
+        }
         $stmt->bind_param("s", $categoria);
         $stmt->execute();
         $result = $stmt->get_result();
         $products = [];
-        while ($row = $result->fetch_assoc()) {
-            $products[] = $row;
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $products[] = $row;
+            }
         }
+        $stmt->close();
+        $conectar->close();
         return $products;
     }
 
@@ -124,13 +143,21 @@ class Product {
         $conectar = db::connect();
         $search = "%$query%";
         $stmt = $conectar->prepare("SELECT * FROM producto WHERE nombre LIKE ? OR descripcion LIKE ?");
+        if (!$stmt) {
+            $conectar->close();
+            return [];
+        }
         $stmt->bind_param("ss", $search, $search);
         $stmt->execute();
         $result = $stmt->get_result();
         $products = [];
-        while ($row = $result->fetch_assoc()) {
-            $products[] = $row;
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $products[] = $row;
+            }
         }
+        $stmt->close();
+        $conectar->close();
         return $products;
     }
 }
