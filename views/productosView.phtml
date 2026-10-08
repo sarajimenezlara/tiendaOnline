@@ -2,21 +2,14 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tienda Online</title>
+        <title>Productos</title>
     </head>
     <body>
-        <h1>Tienda Online</h1>
+        <h1>Productos</h1>
+        <p><a href="index.php">Inicio</a></p>
         <?php if (!empty($dbError)): ?>
             <p style="color:red;">Error BD: <?= htmlspecialchars($dbError) ?></p>
         <?php endif; ?>
-        <?php if (!empty($_SESSION['user_id'])): ?>
-            <p>Hola, <?= htmlspecialchars($_SESSION['user_nombre'] ?? 'usuario') ?> (<a href="index.php?action=logout">Salir</a>)</p>
-            <p><a href="index.php?action=comprar"><button>Comprar (crear pedido)</button></a></p>
-        <?php else: ?>
-            <p><a href="index.php?action=login">Iniciar sesión</a> | <a href="index.php?action=register">Registrarse</a></p>
-        <?php endif; ?>
-        <p><a href="index.php?action=productos">Ver productos</a></p>
-        <h2>Productos</h2>
         <?php if (empty($products)): ?>
             <p>No hay productos.</p>
         <?php else: ?>
@@ -26,7 +19,6 @@
                     <a href="index.php?action=ver&id=<?= (int)$p->getId() ?>"><?= htmlspecialchars($p->getNombre()) ?></a>
                     - <?= htmlspecialchars($p->getCategoria()) ?>
                     - <?= number_format($p->getPrecio(), 2) ?> €
-                    (stock: <?= (int)$p->getStock() ?>)
                 </li>
             <?php endforeach; ?>
             </ul>

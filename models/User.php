@@ -12,11 +12,11 @@ class User
     private ?string $direccion;
 
     public function __construct(
-        int $id,
-        string $nombre,
-        string $apellidos,
-        string $correo,
-        string $contraseña,
+        int $id = 0,
+        string $nombre = '',
+        string $apellidos = '',
+        string $correo = '',
+        string $contraseña = '',
         ?string $telefono = null,
         ?string $metodo_pago = null,
         ?string $direccion = null
@@ -74,6 +74,17 @@ class User
     public function setContraseña(string $contraseña): void
     {
         $this->contraseña = $contraseña;
+    }
+
+    // Aliases ASCII para evitar problemas con la ñ en algunos editores
+    public function getContrasena(): string
+    {
+        return $this->contraseña;
+    }
+
+    public function setContrasena(string $contrasena): void
+    {
+        $this->contraseña = $contrasena;
     }
 
     public function getTelefono(): ?string

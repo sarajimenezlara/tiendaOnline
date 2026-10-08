@@ -23,7 +23,7 @@ class UserRepository
     public function getAll(): array
     {
         $conn = db::connect();
-        $result = $conn->query('SELECT * FROM user ORDER BY id ASC');
+        $result = $conn->query('SELECT * FROM `user` ORDER BY id ASC');
         $users = [];
         if ($result) {
             while ($row = $result->fetch_assoc()) {
@@ -38,7 +38,11 @@ class UserRepository
     public function getById(int $id): ?User
     {
         $conn = db::connect();
-        $stmt = $conn->prepare('SELECT * FROM user WHERE id = ?');
+        $stmt = $conn->prepare('SELECT * FROM `user` WHERE id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return null;
+        }
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -51,7 +55,11 @@ class UserRepository
     public function getByCorreo(string $correo): ?User
     {
         $conn = db::connect();
-        $stmt = $conn->prepare('SELECT * FROM user WHERE correo = ?');
+        $stmt = $conn->prepare('SELECT * FROM `user` WHERE correo = ?');
+        if (!$stmt) {
+            $conn->close();
+            return null;
+        }
         $stmt->bind_param('s', $correo);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -61,14 +69,14 @@ class UserRepository
         return $row ? self::mapRow($row) : null;
     }
 
-    /**
-     * Compatibilidad con userController.php: busca por nombre o correo
-     * y devuelve array con claves 'id' y 'password' (alias de 'contraseña').
-     */
     public function getUserByUsername(string $username): ?array
     {
         $conn = db::connect();
-        $stmt = $conn->prepare('SELECT * FROM user WHERE nombre = ? OR correo = ? LIMIT 1');
+        $stmt = $conn->prepare('SELECT * FROM `user` WHERE nombre = ? OR correo = ? LIMIT 1');
+        if (!$stmt) {
+            $conn->close();
+            return null;
+        }
         $stmt->bind_param('ss', $username, $username);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -78,26 +86,39 @@ class UserRepository
         if (!$row) {
             return null;
         }
-        // Aliases para el controlador antiguo
         $row['password'] = $row['contraseña'];
         $row['username'] = $row['nombre'];
         return $row;
     }
 
-    /**
-     * Crea un usuario. Si la contraseña no está hasheada, la hashea.
-     * @return int id insertado
-     */
+    public function getUserObjectByUsername(string $username): ?User
+    {
+        $row = $this->getUserByUsername($username);
+        if (!$row) {
+            return null;
+        }
+        return self::mapRow($row);
+    }
+
     public function create(User $user): int
     {
         $conn = db::connect();
         $stmt = $conn->prepare(
-            'INSERT INTO user (nombre, apellidos, correo, contraseña, telefono, metodo_pago, direccion) VALUES (?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO `user` (nombre, apellidos, correo, `contraseña`, telefono, metodo_pago, direccion) VALUES (?, ?, ?, ?, ?, ?, ?)'
         );
+        if (!$stmt) {
+            $conn->close();
+            throw new RuntimeException('Prepare failed: ' . $conn->error);
+        }
         $nombre = $user->getNombre();
         $apellidos = $user->getApellidos();
         $correo = $user->getCorreo();
         $pass = $user->getContraseña();
+        if ($pass === '' ) {
+            $stmt->close();
+            $conn->close();
+            throw new InvalidArgumentException('La contraseña no puede estar vacía');
+        }
         if (password_get_info($pass)['algo'] === null) {
             $pass = password_hash($pass, PASSWORD_DEFAULT);
         }
@@ -105,7 +126,12 @@ class UserRepository
         $metodo = $user->getMetodoPago();
         $direccion = $user->getDireccion();
         $stmt->bind_param('sssssss', $nombre, $apellidos, $correo, $pass, $telefono, $metodo, $direccion);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            $err = $stmt->error;
+            $stmt->close();
+            $conn->close();
+            throw new RuntimeException('Execute failed: ' . $err);
+        }
         $id = $conn->insert_id;
         $stmt->close();
         $conn->close();
@@ -116,8 +142,12 @@ class UserRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare(
-            'UPDATE user SET nombre = ?, apellidos = ?, correo = ?, telefono = ?, metodo_pago = ?, direccion = ? WHERE id = ?'
+            'UPDATE `user` SET nombre = ?, apellidos = ?, correo = ?, telefono = ?, metodo_pago = ?, direccion = ? WHERE id = ?'
         );
+        if (!$stmt) {
+            $conn->close();
+            return false;
+        }
         $nombre = $user->getNombre();
         $apellidos = $user->getApellidos();
         $correo = $user->getCorreo();
@@ -132,10 +162,30 @@ class UserRepository
         return $ok;
     }
 
+    public function updatePassword(int $id, string $plainPassword): bool
+    {
+        $hash = password_hash($plainPassword, PASSWORD_DEFAULT);
+        $conn = db::connect();
+        $stmt = $conn->prepare('UPDATE `user` SET `contraseña` = ? WHERE id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return false;
+        }
+        $stmt->bind_param('si', $hash, $id);
+        $ok = $stmt->execute();
+        $stmt->close();
+        $conn->close();
+        return $ok;
+    }
+
     public function delete(int $id): bool
     {
         $conn = db::connect();
-        $stmt = $conn->prepare('DELETE FROM user WHERE id = ?');
+        $stmt = $conn->prepare('DELETE FROM `user` WHERE id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return false;
+        }
         $stmt->bind_param('i', $id);
         $ok = $stmt->execute();
         $stmt->close();

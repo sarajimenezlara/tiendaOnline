@@ -1,4 +1,7 @@
 <?php
+
+require_once __DIR__ . '/../db.php';
+
 class Producto
 {
     private int $id;
@@ -9,11 +12,11 @@ class Producto
     private ?string $descripcion;
 
     public function __construct(
-        int $id,
-        string $nombre,
-        string $categoria,
-        int $stock,
-        float $precio,
+        int $id = 0,
+        string $nombre = '',
+        string $categoria = '',
+        int $stock = 0,
+        float $precio = 0,
         ?string $descripcion = null
     ) {
         $this->id = $id;
@@ -79,60 +82,71 @@ class Producto
         $this->descripcion = $descripcion;
     }
 }
-=======
-class Product {
-    private $id;
-    private $nombre;
-    private $descripcion;
-    private $precio;
-    private $categoria;
-    private $stock;
 
-    public static function getAll() {
-        $conectar = db::connect();
-        $sql = "SELECT * FROM producto";
-        $result = $conectar->query($sql);
-        $products = [];
-        while ($row = $result->fetch_assoc()) {
-            $products[] = $row;
+class Product
+{
+    private static function repo(): ProductRepository
+    {
+        require_once __DIR__ . '/ProductRepository.php';
+        return new ProductRepository();
+    }
+
+    /** @return Producto[] */
+    public static function getAll(): array
+    {
+        return self::repo()->getAll();
+    }
+
+    public static function getById($id): ?Producto
+    {
+        return self::repo()->getById((int)$id);
+    }
+
+    /** @return Producto[] Alias inglés */
+    public static function getByCategory($categoria): array
+    {
+        return self::repo()->getByCategoria((string)$categoria);
+    }
+
+    /** @return Producto[] Alias español */
+    public static function getByCategoria($categoria): array
+    {
+        return self::repo()->getByCategoria((string)$categoria);
+    }
+
+    /** @return Producto[] */
+    public static function search($query): array
+    {
+        $conn = db::connect();
+        $search = '%' . (string)$query . '%';
+        $stmt = $conn->prepare('SELECT * FROM producto WHERE nombre LIKE ? OR descripcion LIKE ?');
+        if (!$stmt) {
+            $conn->close();
+            return [];
         }
-        return $products;
-    }
-
-    public static function getById($id) {
-        $conectar = db::connect();
-        $stmt = $conectar->prepare("SELECT * FROM producto WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_assoc();
-    }
-
-    public static function getByCategory($categoria) {
-        $conectar = db::connect();
-        $stmt = $conectar->prepare("SELECT * FROM producto WHERE categoria = ?");
-        $stmt->bind_param("s", $categoria);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $products = [];
-        while ($row = $result->fetch_assoc()) {
-            $products[] = $row;
-        }
-        return $products;
-    }
-
-    public static function search($query) {
-        $conectar = db::connect();
-        $search = "%$query%";
-        $stmt = $conectar->prepare("SELECT * FROM producto WHERE nombre LIKE ? OR descripcion LIKE ?");
-        $stmt->bind_param("ss", $search, $search);
+        $stmt->bind_param('ss', $search, $search);
         $stmt->execute();
         $result = $stmt->get_result();
         $products = [];
-        while ($row = $result->fetch_assoc()) {
-            $products[] = $row;
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $products[] = new Producto(
+                    (int)$row['id'],
+                    $row['nombre'],
+                    $row['categoria'],
+                    (int)$row['stock'],
+                    (float)$row['precio'],
+                    $row['descripcion'] ?? null
+                );
+            }
         }
+        $stmt->close();
+        $conn->close();
         return $products;
+    }
+
+    public static function create(Producto $producto): int
+    {
+        return self::repo()->create($producto);
     }
 }
-?>

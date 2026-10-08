@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Confirmación de pedido</title>
+    </head>
+    <body>
+        <h1>Pedido #<?= (int)$pedido->getId() ?> confirmado</h1>
+        <p><a href="index.php">Volver al inicio</a></p>
+        <p>Estado: <?= htmlspecialchars($pedido->getEstado()) ?></p>
+        <p>Fecha: <?= htmlspecialchars($pedido->getFecha()->format('Y-m-d H:i:s')) ?></p>
+        <h2>Líneas</h2>
+        <?php if (empty($lineas)): ?>
+            <p>Pedido sin líneas (creado vacío desde "Comprar").</p>
+        <?php else: ?>
+            <ul>
+            <?php foreach ($lineas as $l): ?>
+                <li>Producto #<?= (int)$l->getProductoId() ?> x<?= (int)$l->getCantidad() ?> - <?= number_format($l->getPrecioUnitario(), 2) ?> € (subtotal <?= number_format($l->getSubtotal(), 2) ?> €)</li>
+            <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+        <p><strong>Total líneas: <?= number_format($total, 2) ?> €</strong></p>
+        <p>Total pedido guardado: <?= number_format($pedido->getPrecioTotal(), 2) ?> €</p>
+    </body>
+</html>

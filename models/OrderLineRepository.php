@@ -20,6 +20,10 @@ class OrderLineRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare('SELECT * FROM linea_pedido WHERE id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return null;
+        }
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -34,6 +38,10 @@ class OrderLineRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare('SELECT * FROM linea_pedido WHERE pedido_id = ? ORDER BY id ASC');
+        if (!$stmt) {
+            $conn->close();
+            return [];
+        }
         $stmt->bind_param('i', $pedido_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -50,12 +58,24 @@ class OrderLineRepository
 
     public function create(int $pedido_id, int $producto_id, int $cantidad, float $precio_unitario): int
     {
+        if ($cantidad <= 0) {
+            throw new InvalidArgumentException('La cantidad debe ser > 0');
+        }
         $conn = db::connect();
         $stmt = $conn->prepare(
             'INSERT INTO linea_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)'
         );
+        if (!$stmt) {
+            $conn->close();
+            throw new RuntimeException('Prepare failed: ' . $conn->error);
+        }
         $stmt->bind_param('iiid', $pedido_id, $producto_id, $cantidad, $precio_unitario);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            $err = $stmt->error;
+            $stmt->close();
+            $conn->close();
+            throw new RuntimeException('Execute failed: ' . $err);
+        }
         $id = $conn->insert_id;
         $stmt->close();
         $conn->close();
@@ -64,8 +84,15 @@ class OrderLineRepository
 
     public function updateCantidad(int $id, int $cantidad): bool
     {
+        if ($cantidad <= 0) {
+            return false;
+        }
         $conn = db::connect();
         $stmt = $conn->prepare('UPDATE linea_pedido SET cantidad = ? WHERE id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return false;
+        }
         $stmt->bind_param('ii', $cantidad, $id);
         $ok = $stmt->execute();
         $stmt->close();
@@ -77,6 +104,10 @@ class OrderLineRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare('DELETE FROM linea_pedido WHERE id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return false;
+        }
         $stmt->bind_param('i', $id);
         $ok = $stmt->execute();
         $stmt->close();
@@ -88,6 +119,10 @@ class OrderLineRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare('DELETE FROM linea_pedido WHERE pedido_id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return false;
+        }
         $stmt->bind_param('i', $pedido_id);
         $ok = $stmt->execute();
         $stmt->close();

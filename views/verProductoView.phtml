@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Producto</title>
+    </head>
+    <body>
+        <h1><?= htmlspecialchars($product->getNombre()) ?></h1>
+        <p><a href="index.php?action=productos">Volver a productos</a></p>
+        <?php if (!empty($dbError)): ?>
+            <p style="color:red;">Error BD: <?= htmlspecialchars($dbError) ?></p>
+        <?php endif; ?>
+        <p>Categoría: <?= htmlspecialchars($product->getCategoria()) ?></p>
+        <p>Precio: <?= number_format($product->getPrecio(), 2) ?> €</p>
+        <p>Stock: <?= (int)$product->getStock() ?></p>
+        <p>Descripción: <?= htmlspecialchars($product->getDescripcion() ?? '') ?></p>
+    </body>
+</html>

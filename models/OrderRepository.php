@@ -20,6 +20,10 @@ class OrderRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare('SELECT * FROM pedido WHERE id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return null;
+        }
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -34,6 +38,10 @@ class OrderRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare('SELECT * FROM pedido WHERE user_id = ? ORDER BY fecha DESC');
+        if (!$stmt) {
+            $conn->close();
+            return [];
+        }
         $stmt->bind_param('i', $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -68,8 +76,17 @@ class OrderRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare('INSERT INTO pedido (user_id, estado, precio_total) VALUES (?, ?, ?)');
+        if (!$stmt) {
+            $conn->close();
+            throw new RuntimeException('Prepare failed: ' . $conn->error);
+        }
         $stmt->bind_param('isd', $user_id, $estado, $precio_total);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            $err = $stmt->error;
+            $stmt->close();
+            $conn->close();
+            throw new RuntimeException('Execute failed: ' . $err);
+        }
         $id = $conn->insert_id;
         $stmt->close();
         $conn->close();
@@ -80,6 +97,10 @@ class OrderRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare('UPDATE pedido SET estado = ? WHERE id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return false;
+        }
         $stmt->bind_param('si', $estado, $id);
         $ok = $stmt->execute();
         $stmt->close();
@@ -91,6 +112,10 @@ class OrderRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare('UPDATE pedido SET precio_total = ? WHERE id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return false;
+        }
         $stmt->bind_param('di', $precio_total, $id);
         $ok = $stmt->execute();
         $stmt->close();
@@ -101,7 +126,17 @@ class OrderRepository
     public function delete(int $id): bool
     {
         $conn = db::connect();
+        $stmt = $conn->prepare('DELETE FROM linea_pedido WHERE pedido_id = ?');
+        if ($stmt) {
+            $stmt->bind_param('i', $id);
+            $stmt->execute();
+            $stmt->close();
+        }
         $stmt = $conn->prepare('DELETE FROM pedido WHERE id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return false;
+        }
         $stmt->bind_param('i', $id);
         $ok = $stmt->execute();
         $stmt->close();
@@ -110,7 +145,6 @@ class OrderRepository
     }
 }
 
-// Aliases para compatibilidad español / inglés
 if (!class_exists('PedidoRepository', false)) {
     class_alias('OrderRepository', 'PedidoRepository');
 }

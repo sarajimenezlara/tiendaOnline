@@ -9,11 +9,11 @@ class LineaPedido
     private float $precio_unitario;
 
     public function __construct(
-        int $id,
-        int $pedido_id,
-        int $producto_id,
-        int $cantidad,
-        float $precio_unitario
+        int $id = 0,
+        int $pedido_id = 0,
+        int $producto_id = 0,
+        int $cantidad = 1,
+        float $precio_unitario = 0
     ) {
         $this->id = $id;
         $this->pedido_id = $pedido_id;
@@ -73,7 +73,6 @@ class LineaPedido
     }
 }
 
-// Alias para compatibilidad con el nombre del fichero / usos antiguos
 if (!class_exists('Linea_pedido', false)) {
     class_alias('LineaPedido', 'Linea_pedido');
 }

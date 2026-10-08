@@ -1,0 +1,6 @@
+<?php // Compatibilidad con nombre antiguo con typo: redirige a la vista correcta
+if (isset($product)) {
+    require __DIR__ . '/verProductoView.phtml';
+} else {
+    echo 'Vista antigua: usa index.php?action=ver&id=...';
+}

@@ -37,6 +37,10 @@ class ProductRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare('SELECT * FROM producto WHERE id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return null;
+        }
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -51,6 +55,10 @@ class ProductRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare('SELECT * FROM producto WHERE categoria = ? ORDER BY id ASC');
+        if (!$stmt) {
+            $conn->close();
+            return [];
+        }
         $stmt->bind_param('s', $categoria);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -71,13 +79,22 @@ class ProductRepository
         $stmt = $conn->prepare(
             'INSERT INTO producto (nombre, categoria, stock, precio, descripcion) VALUES (?, ?, ?, ?, ?)'
         );
+        if (!$stmt) {
+            $conn->close();
+            throw new RuntimeException('Prepare failed: ' . $conn->error);
+        }
         $nombre = $producto->getNombre();
         $categoria = $producto->getCategoria();
         $stock = $producto->getStock();
         $precio = $producto->getPrecio();
         $descripcion = $producto->getDescripcion();
         $stmt->bind_param('ssids', $nombre, $categoria, $stock, $precio, $descripcion);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            $err = $stmt->error;
+            $stmt->close();
+            $conn->close();
+            throw new RuntimeException('Execute failed: ' . $err);
+        }
         $id = $conn->insert_id;
         $stmt->close();
         $conn->close();
@@ -90,6 +107,10 @@ class ProductRepository
         $stmt = $conn->prepare(
             'UPDATE producto SET nombre = ?, categoria = ?, stock = ?, precio = ?, descripcion = ? WHERE id = ?'
         );
+        if (!$stmt) {
+            $conn->close();
+            return false;
+        }
         $nombre = $producto->getNombre();
         $categoria = $producto->getCategoria();
         $stock = $producto->getStock();
@@ -107,6 +128,10 @@ class ProductRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare('UPDATE producto SET stock = ? WHERE id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return false;
+        }
         $stmt->bind_param('ii', $stock, $id);
         $ok = $stmt->execute();
         $stmt->close();
@@ -118,6 +143,10 @@ class ProductRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare('DELETE FROM producto WHERE id = ?');
+        if (!$stmt) {
+            $conn->close();
+            return false;
+        }
         $stmt->bind_param('i', $id);
         $ok = $stmt->execute();
         $stmt->close();
@@ -126,7 +155,6 @@ class ProductRepository
     }
 }
 
-// Alias en inglés para compatibilidad
 if (!class_exists('ProductoRepository', false)) {
     class_alias('ProductRepository', 'ProductoRepository');
 }
