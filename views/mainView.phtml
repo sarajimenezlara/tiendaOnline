@@ -13,7 +13,7 @@
             <?php if (isset($_SESSION['user_id'])): ?>
                 <span>Hola, <?= htmlspecialchars($_SESSION['user_nombre']) ?></span>
                 <a href="index.php?action=logout"><button>Logout</button></a>
-                <a href="index.php?c=order&show=1"><button>Ver Carrito</button></a>
+                <a href="index.php?c=order&show=1" class="nav-right"><button>Ver Carrito</button></a>
             <?php else: ?>
                 <h1>Tienda Online</h1>
                 <a href="index.php?action=login"><button>Iniciar sesión</button></a>
@@ -21,8 +21,10 @@
             <?php endif; ?>
         </nav>
         <?php if (isset($_SESSION['user_id'])): ?>
-            <h1>Productos disponibles:</h1>
-            <a href="index.php?action=productos&view=1"><button>Ver Productos</button></a>
+            <div class="productos-center-container">
+                <h2>Productos disponibles:</h2>
+                <a href="index.php?action=productos&view=1"><button class="btn-large">Ver Productos</button></a>
+            </div>
         <?php endif; ?>
     </body>
 </html>
