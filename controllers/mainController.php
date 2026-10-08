@@ -31,8 +31,17 @@ class MainController {
         }
         if (isset($_GET['add'])) {
             if (isset($_POST['name']) && isset($_POST['description']) && isset($_POST['stock']) && isset($_POST['price'])) {
-                $q = "INSERT INTO products VALUES(NULL,'" . $_POST['name'] . "','" . $_POST['description'] . "'," . $_POST['stock'] . "," . $_POST['price'] . ")";
-                $pdo->query($q);
+                $conn = db::connect();
+                $stmt = $conn->prepare('INSERT INTO producto (nombre, categoria, stock, precio, descripcion) VALUES (?, ?, ?, ?, ?)');
+                $nombre = $_POST['name'];
+                $categoria = $_POST['categoria'] ?? 'general';
+                $stock = (int)$_POST['stock'];
+                $precio = (float)$_POST['price'];
+                $descripcion = $_POST['description'];
+                $stmt->bind_param('ssids', $nombre, $categoria, $stock, $precio, $descripcion);
+                $stmt->execute();
+                $stmt->close();
+                $conn->close();
                 header('Location: index.php?action=productos');
                 exit();
             } else {
