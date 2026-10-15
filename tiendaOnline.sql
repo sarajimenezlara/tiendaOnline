@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS user (
 CREATE TABLE IF NOT EXISTS producto (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
-    categoria VARCHAR(100) NOT NULL,
+    categoria ENUM('alimentacion','tecnologia','accesorios','deporte') NOT NULL,
     stock INT NOT NULL DEFAULT 0,
     precio DECIMAL(10, 2) NOT NULL,
     descripcion TEXT

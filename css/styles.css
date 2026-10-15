@@ -96,3 +96,16 @@ body > div p { margin: 4px 0; }
     font-weight: bold;
 }
 
+/* Menú de categorías */
+.categorias {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 16px 0;
+}
+
+.categorias .activa button {
+    background: #333;
+    color: #fff;
+}

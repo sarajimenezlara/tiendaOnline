@@ -14,7 +14,11 @@ if (($_SESSION['user_rol'] ?? '') !== 'admin') {
     <input type="text" name="name" id="name" required>
     
     <label for="categoria">Categoría:</label>
-    <input type="text" name="categoria" id="categoria" required>
+    <select name="categoria" id="categoria" required>
+        <?php foreach (Producto::CATEGORIAS as $clave => $nombre): ?>
+            <option value="<?= $clave ?>"><?= $nombre ?></option>
+        <?php endforeach; ?>
+    </select>
 
     <label for="description">Descripción:</label>
     <textarea name="description" id="description" required></textarea>
