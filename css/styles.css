@@ -169,3 +169,15 @@ body > div p { margin: 4px 0; }
     border: 1px solid #34a853;
     color: #137333;
 }
+
+/* Imagen de cada producto en el listado */
+.producto-imagen {
+    display: block;
+    width: 100%;
+    max-width: 260px;
+    height: 180px;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}

@@ -27,6 +27,9 @@
         <?php endif; ?>
         <?php foreach ($products as $product): ?>
             <div>
+                <?php if (!empty($product['imagen'])): ?>
+                    <img class="producto-imagen" src="img/productos/<?= htmlspecialchars($product['imagen']) ?>" alt="<?= htmlspecialchars($product['nombre']) ?>">
+                <?php endif; ?>
                 <h3><?= htmlspecialchars($product['nombre']) ?></h3>
                 <p><?= htmlspecialchars($product['descripcion']) ?></p>
                 <p>Precio: <?= htmlspecialchars($product['precio']) ?>€</p>

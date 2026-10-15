@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS producto (
     categoria ENUM('alimentacion','tecnologia','accesorios','deporte') NOT NULL,
     stock INT NOT NULL DEFAULT 0,
     precio DECIMAL(10, 2) NOT NULL,
-    descripcion TEXT
+    descripcion TEXT,
+    imagen VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS pedido (

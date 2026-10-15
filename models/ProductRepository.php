@@ -13,7 +13,8 @@ class ProductRepository
             $row['categoria'],
             (int)$row['stock'],
             (float)$row['precio'],
-            $row['descripcion'] ?? null
+            $row['descripcion'] ?? null,
+            $row['imagen'] ?? null
         );
     }
 

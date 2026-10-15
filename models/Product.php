@@ -14,6 +14,7 @@ class Producto implements ArrayAccess
     private int $stock;
     private float $precio;
     private ?string $descripcion;
+    private ?string $imagen;
 
     public function __construct(
         int $id,
@@ -21,7 +22,8 @@ class Producto implements ArrayAccess
         string $categoria,
         int $stock,
         float $precio,
-        ?string $descripcion = null
+        ?string $descripcion = null,
+        ?string $imagen = null
     ) {
         $this->id = $id;
         $this->nombre = $nombre;
@@ -29,6 +31,7 @@ class Producto implements ArrayAccess
         $this->stock = $stock;
         $this->precio = $precio;
         $this->descripcion = $descripcion;
+        $this->imagen = $imagen;
     }
 
     public function getId(): int
@@ -86,9 +89,19 @@ class Producto implements ArrayAccess
         $this->descripcion = $descripcion;
     }
 
+    public function getImagen(): ?string
+    {
+        return $this->imagen;
+    }
+
+    public function setImagen(?string $imagen): void
+    {
+        $this->imagen = $imagen;
+    }
+
     public function offsetExists(mixed $offset): bool
     {
-        return in_array($offset, ['id', 'nombre', 'categoria', 'stock', 'precio', 'descripcion']);
+        return in_array($offset, ['id', 'nombre', 'categoria', 'stock', 'precio', 'descripcion', 'imagen']);
     }
 
     public function offsetGet(mixed $offset): mixed
@@ -100,6 +113,7 @@ class Producto implements ArrayAccess
             'stock' => $this->stock,
             'precio' => $this->precio,
             'descripcion' => $this->descripcion,
+            'imagen' => $this->imagen,
             default => null
         };
     }
@@ -113,6 +127,7 @@ class Producto implements ArrayAccess
             'stock' => $this->stock = (int)$value,
             'precio' => $this->precio = (float)$value,
             'descripcion' => $this->descripcion = $value,
+            'imagen' => $this->imagen = $value,
             default => null
         };
     }
