@@ -95,6 +95,36 @@ class OrderLineRepository
         return $ok;
     }
 
+    /** @return LineaPedido[] */
+    public function getByProducto(int $producto_id): array
+    {
+        $conn = db::connect();
+        $stmt = $conn->prepare('SELECT * FROM detalle_pedido WHERE producto_id = ?');
+        $stmt->bind_param('i', $producto_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $lineas = [];
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $lineas[] = self::mapRow($row);
+            }
+        }
+        $stmt->close();
+        $conn->close();
+        return $lineas;
+    }
+
+    public function deleteByProducto(int $producto_id): bool
+    {
+        $conn = db::connect();
+        $stmt = $conn->prepare('DELETE FROM detalle_pedido WHERE producto_id = ?');
+        $stmt->bind_param('i', $producto_id);
+        $ok = $stmt->execute();
+        $stmt->close();
+        $conn->close();
+        return $ok;
+    }
+
     public function calcTotal(int $pedido_id): float
     {
         $total = 0.0;

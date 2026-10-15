@@ -18,6 +18,12 @@
             <?php endif; ?>
             <a href="index.php?c=order&show=1" class="nav-right"><button>Ver Carrito</button></a>
         </nav>
+        <?php if (isset($_GET['ok']) && $_GET['ok'] === 'eliminado'): ?>
+            <p class="mensaje-ok">Producto eliminado correctamente.</p>
+        <?php endif; ?>
+        <?php if (isset($_GET['error'])): ?>
+            <p class="mensaje-error">No se pudo eliminar el producto.</p>
+        <?php endif; ?>
         <div class="categorias">
             <a href="index.php?action=productos" class="<?= $categoria === null ? 'activa' : '' ?>"><button>Ver todo</button></a>
             <?php foreach (Producto::CATEGORIAS as $clave => $nombre): ?>
