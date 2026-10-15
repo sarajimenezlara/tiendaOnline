@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS user (
     contraseña VARCHAR(255) NOT NULL,
     telefono VARCHAR(20),
     metodo_pago VARCHAR(100),
-    direccion VARCHAR(255)
+    direccion VARCHAR(255),
+    rol ENUM('usuario','admin') NOT NULL DEFAULT 'usuario'
 );
 
 CREATE TABLE IF NOT EXISTS producto (
