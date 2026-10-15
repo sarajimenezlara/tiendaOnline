@@ -15,7 +15,8 @@ class UserRepository
             $row['contraseña'],
             $row['telefono'] ?? null,
             $row['metodo_pago'] ?? null,
-            $row['direccion'] ?? null
+            $row['direccion'] ?? null,
+            $row['rol'] ?? 'usuario'
         );
     }
 

@@ -11,7 +11,7 @@
     <body>
         <nav>
             <?php if (isset($_SESSION['user_id'])): ?>
-                <span>Hola, <?= htmlspecialchars($_SESSION['user_nombre']) ?></span>
+                <span>Hola, <?= htmlspecialchars($_SESSION['user_nombre']) ?><?php if (($_SESSION['user_rol'] ?? '') === 'admin'): ?> (admin)<?php endif; ?></span>
                 <a href="index.php?action=logout"><button>Logout</button></a>
                 <a href="index.php?c=order&show=1" class="nav-right"><button>Ver Carrito</button></a>
             <?php else: ?>

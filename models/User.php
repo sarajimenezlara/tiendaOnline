@@ -10,6 +10,7 @@ class User implements ArrayAccess
     private ?string $telefono;
     private ?string $metodo_pago;
     private ?string $direccion;
+    private string $rol;
 
     public function __construct(
         int $id,
@@ -19,7 +20,8 @@ class User implements ArrayAccess
         string $contraseña,
         ?string $telefono = null,
         ?string $metodo_pago = null,
-        ?string $direccion = null
+        ?string $direccion = null,
+        string $rol = 'usuario'
     ) {
         $this->id = $id;
         $this->nombre = $nombre;
@@ -29,11 +31,12 @@ class User implements ArrayAccess
         $this->telefono = $telefono;
         $this->metodo_pago = $metodo_pago;
         $this->direccion = $direccion;
+        $this->rol = $rol;
     }
 
     public function offsetExists(mixed $offset): bool
     {
-        return in_array($offset, ['id', 'nombre', 'apellidos', 'correo', 'contraseña', 'telefono', 'metodo_pago', 'direccion']);
+        return in_array($offset, ['id', 'nombre', 'apellidos', 'correo', 'contraseña', 'telefono', 'metodo_pago', 'direccion', 'rol']);
     }
 
     public function offsetGet(mixed $offset): mixed
@@ -47,6 +50,7 @@ class User implements ArrayAccess
             'telefono' => $this->telefono,
             'metodo_pago' => $this->metodo_pago,
             'direccion' => $this->direccion,
+            'rol' => $this->rol,
             default => null
         };
     }
@@ -62,6 +66,7 @@ class User implements ArrayAccess
             'telefono' => $this->telefono = $value,
             'metodo_pago' => $this->metodo_pago = $value,
             'direccion' => $this->direccion = $value,
+            'rol' => $this->rol = (string)$value,
             default => null
         };
     }
@@ -141,6 +146,21 @@ class User implements ArrayAccess
     public function setDireccion(?string $direccion): void
     {
         $this->direccion = $direccion;
+    }
+
+    public function getRol(): string
+    {
+        return $this->rol;
+    }
+
+    public function setRol(string $rol): void
+    {
+        $this->rol = $rol;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->rol === 'admin';
     }
 
     public static function login($nombre, $contraseña) {

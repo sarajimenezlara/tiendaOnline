@@ -27,6 +27,7 @@ class MainController {
             if ($userRow && password_verify($_POST['contraseña'], $userRow['password'])) {
                 $_SESSION['user_id'] = $userRow['id'];
                 $_SESSION['user_nombre'] = $userRow['nombre'];
+                $_SESSION['user_rol'] = $userRow['rol'] ?? 'usuario';
                 header('Location: index.php?action=index');
                 exit();
             } else {
@@ -36,12 +37,22 @@ class MainController {
         require_once 'views/loginView.phtml';
     }
 
+    // Redirige al inicio si el usuario no es admin
+    private function soloAdmin() {
+        if (($_SESSION['user_rol'] ?? '') !== 'admin') {
+            header('Location: index.php?action=index');
+            exit();
+        }
+    }
+
     public function productos() {
         if (isset($_GET['new'])) {
+            $this->soloAdmin();
             require_once 'views/newProduct.phtml';
             return;
         }
         if (isset($_GET['add'])) {
+            $this->soloAdmin();
             if (isset($_POST['name']) && isset($_POST['description']) && isset($_POST['stock']) && isset($_POST['price'])) {
                 $producto = new Producto(
                     0,
@@ -105,6 +116,7 @@ class MainController {
                 if ($nuevoId) {
                     $_SESSION['user_id'] = $nuevoId;
                     $_SESSION['user_nombre'] = $nombre;
+                    $_SESSION['user_rol'] = 'usuario';
                     header('Location: index.php?action=index');
                     exit();
                 } else {
