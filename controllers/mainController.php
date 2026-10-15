@@ -4,16 +4,19 @@ require_once __DIR__ . '/../models/ProductRepository.php';
 require_once __DIR__ . '/../models/UserRepository.php';
 require_once __DIR__ . '/../models/OrderRepository.php';
 require_once __DIR__ . '/../models/OrderLineRepository.php';
+require_once __DIR__ . '/../models/OrderLineRepository.php';
 
 class MainController {
     private ProductRepository $productRepo;
     private UserRepository $userRepo;
     private OrderRepository $orderRepo;
+    private OrderLineRepository $orderLineRepo;
 
     public function __construct() {
         $this->productRepo = new ProductRepository();
         $this->userRepo = new UserRepository();
         $this->orderRepo = new OrderRepository();
+        $this->orderLineRepo = new OrderLineRepository();
     }
     
     public function index() {
@@ -77,6 +80,15 @@ class MainController {
     public function verProducto($id) {
         $product = $this->productRepo->getById((int)$id);
         require_once 'views/verProductoView.phtml';
+    }
+
+public function panel() {
+        $this->soloAdmin();
+        $pedidos = $this->orderRepo->getAll();
+        $userRepo = $this->userRepo;
+        $orderLineRepo = $this->orderLineRepo;
+        $productRepo = $this->productRepo;
+        require_once 'views/panelView.phtml';
     }
 
     public function comprar() {

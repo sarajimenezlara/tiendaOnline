@@ -19,7 +19,7 @@ class OrderLineRepository
     public function getById(int $id): ?LineaPedido
     {
         $conn = db::connect();
-        $stmt = $conn->prepare('SELECT * FROM linea_pedido WHERE id = ?');
+        $stmt = $conn->prepare('SELECT * FROM detalle_pedido WHERE id = ?');
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -33,7 +33,7 @@ class OrderLineRepository
     public function getByPedido(int $pedido_id): array
     {
         $conn = db::connect();
-        $stmt = $conn->prepare('SELECT * FROM linea_pedido WHERE pedido_id = ? ORDER BY id ASC');
+        $stmt = $conn->prepare('SELECT * FROM detalle_pedido WHERE pedido_id = ? ORDER BY id ASC');
         $stmt->bind_param('i', $pedido_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -52,7 +52,7 @@ class OrderLineRepository
     {
         $conn = db::connect();
         $stmt = $conn->prepare(
-            'INSERT INTO linea_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)'
+            'INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)'
         );
         $stmt->bind_param('iiid', $pedido_id, $producto_id, $cantidad, $precio_unitario);
         $stmt->execute();
@@ -65,7 +65,7 @@ class OrderLineRepository
     public function updateCantidad(int $id, int $cantidad): bool
     {
         $conn = db::connect();
-        $stmt = $conn->prepare('UPDATE linea_pedido SET cantidad = ? WHERE id = ?');
+        $stmt = $conn->prepare('UPDATE detalle_pedido SET cantidad = ? WHERE id = ?');
         $stmt->bind_param('ii', $cantidad, $id);
         $ok = $stmt->execute();
         $stmt->close();
@@ -76,7 +76,7 @@ class OrderLineRepository
     public function delete(int $id): bool
     {
         $conn = db::connect();
-        $stmt = $conn->prepare('DELETE FROM linea_pedido WHERE id = ?');
+        $stmt = $conn->prepare('DELETE FROM detalle_pedido WHERE id = ?');
         $stmt->bind_param('i', $id);
         $ok = $stmt->execute();
         $stmt->close();
@@ -87,7 +87,7 @@ class OrderLineRepository
     public function deleteByPedido(int $pedido_id): bool
     {
         $conn = db::connect();
-        $stmt = $conn->prepare('DELETE FROM linea_pedido WHERE pedido_id = ?');
+        $stmt = $conn->prepare('DELETE FROM detalle_pedido WHERE pedido_id = ?');
         $stmt->bind_param('i', $pedido_id);
         $ok = $stmt->execute();
         $stmt->close();

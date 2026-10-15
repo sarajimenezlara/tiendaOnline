@@ -89,10 +89,49 @@ body > div p { margin: 4px 0; }
     color: #222;
 }
 
-.btn-large {
-    font-size: 1.25rem;
-    padding: 14px 32px;
-    border-radius: 8px;
+.pedidos-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin: 16px 0;
+}
+
+.pedidos-table thead {
+    background: #1a73e8;
+    color: #fff;
+}
+
+.pedidos-table th,
+.pedidos-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: top;
+}
+
+.pedidos-table th {
     font-weight: bold;
+}
+
+.pedidos-table tbody tr:hover {
+    background: #f0f4ff;
+}
+
+.pedidos-table .total {
+    font-weight: bold;
+    color: #0f5cc0;
+}
+
+.pedidos-table .detalle {
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.panel-container {
+    max-width: 980px;
+    margin: 0 auto;
 }
 
