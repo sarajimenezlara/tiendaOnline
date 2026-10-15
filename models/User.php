@@ -235,7 +235,7 @@ class User implements ArrayAccess
             $id = $conectar->insert_id;
             $stmt->close();
             $conectar->close();
-            return $id; // Devuelve el id del nuevo usuario
+            return $id;  // Devuelve el id del nuevo usuario
         }
         $stmt->close();
         $conectar->close();
