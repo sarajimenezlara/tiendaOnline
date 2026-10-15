@@ -69,7 +69,7 @@ class MainController {
             $error  = null;
             $product = $this->productRepo->getById((int)($_GET['id'] ?? 0));
             if (!$product) {
-                header('Location: index.php?action=productos');
+                header('Location: index.php?action=gestion');
                 exit();
             }
             require_once 'views/editProduct.phtml';
@@ -92,9 +92,9 @@ class MainController {
                     $nuevoTotal = $this->orderLineRepo->calcTotal($pedidoId);
                     $this->orderRepo->updateTotal($pedidoId, $nuevoTotal);
                 }
-                header('Location: index.php?action=productos&ok=eliminado');
+                header('Location: index.php?action=gestion&ok=eliminado');
             } catch (\Throwable $e) {
-                header('Location: index.php?action=productos&error=noeliminar');
+                header('Location: index.php?action=gestion&error=noeliminar');
             }
             exit();
         }
@@ -104,7 +104,7 @@ class MainController {
             $product = $this->productRepo->getById($id);
             $error  = null;
             if (!$product) {
-                header('Location: index.php?action=productos');
+                header('Location: index.php?action=gestion');
                 exit();
             }
 
@@ -131,7 +131,7 @@ class MainController {
 
             $producto = new Producto($id, $nombre, $categoria, $stock, $precio, $descripcion);
             $this->productRepo->update($producto);
-            header('Location: index.php?action=productos&categoria=' . $categoria);
+            header('Location: index.php?action=gestion&ok=editado');
             exit();
         }
         if (isset($_GET['add'])) {
@@ -160,7 +160,7 @@ class MainController {
 
             $producto = new Producto(0, $nombre, $categoria, $stock, $precio, $descripcion);
             $this->productRepo->create($producto);
-            header('Location: index.php?action=productos&categoria=' . $categoria);
+            header('Location: index.php?action=gestion&ok=creado');
             exit();
         }
         $categoria = $_GET['categoria'] ?? null;
@@ -171,6 +171,13 @@ class MainController {
             $products = $this->productRepo->getAll();
         }
         require_once 'views/productosView.phtml';
+    }
+
+    // Listado de productos para el admin, con editar y eliminar
+    public function gestionProductos() {
+        $this->soloAdmin();
+        $products = $this->productRepo->getAll();
+        require_once 'views/gestionProductosView.phtml';
     }
 
     public function verProducto($id) {
