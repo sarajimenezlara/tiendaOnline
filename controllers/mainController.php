@@ -64,6 +64,63 @@ class MainController {
             require_once 'views/newProduct.phtml';
             return;
         }
+        if (isset($_GET['edit'])) {
+            $this->soloAdmin();
+            $error  = null;
+            $product = $this->productRepo->getById((int)($_GET['id'] ?? 0));
+            if (!$product) {
+                header('Location: index.php?action=productos');
+                exit();
+            }
+            require_once 'views/editProduct.phtml';
+            return;
+        }
+        if (isset($_GET['delete'])) {
+            $this->soloAdmin();
+            try {
+                $this->productRepo->delete((int)$_GET['delete']);
+            } catch (\Throwable $e) {
+                // Si tiene pedidos asociados no se puede borrar
+            }
+            header('Location: index.php?action=productos');
+            exit();
+        }
+        if (isset($_GET['update'])) {
+            $this->soloAdmin();
+            $id = (int)($_POST['id'] ?? 0);
+            $product = $this->productRepo->getById($id);
+            $error  = null;
+            if (!$product) {
+                header('Location: index.php?action=productos');
+                exit();
+            }
+
+            $nombre     = trim($_POST['name'] ?? '');
+            $descripcion = trim($_POST['description'] ?? '');
+            $categoria  = $_POST['categoria'] ?? '';
+            $stock      = filter_var($_POST['stock'] ?? '', FILTER_VALIDATE_INT);
+            $precio     = filter_var($_POST['price'] ?? '', FILTER_VALIDATE_FLOAT);
+
+            if ($nombre === '' || $descripcion === '') {
+                $error = "Faltan datos para editar el producto.";
+            } elseif (!array_key_exists($categoria, Producto::CATEGORIAS)) {
+                $error = "Categoría no válida.";
+            } elseif ($stock === false || $stock < 0) {
+                $error = "El stock debe ser un número entero mayor o igual que 0.";
+            } elseif ($precio === false || $precio < 0) {
+                $error = "El precio debe ser un número mayor o igual que 0.";
+            }
+
+            if ($error) {
+                require_once 'views/editProduct.phtml';
+                return;
+            }
+
+            $producto = new Producto($id, $nombre, $categoria, $stock, $precio, $descripcion);
+            $this->productRepo->update($producto);
+            header('Location: index.php?action=productos&categoria=' . $categoria);
+            exit();
+        }
         if (isset($_GET['add'])) {
             $this->soloAdmin();
             $nombre = trim($_POST['name'] ?? '');

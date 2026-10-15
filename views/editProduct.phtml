@@ -1,0 +1,56 @@
+<?php
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php?action=login');
+    exit();
+}
+if (($_SESSION['user_rol'] ?? '') !== 'admin') {
+    header('Location: index.php?action=index');
+    exit();
+}
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Producto</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav>
+        <h1>Editar Producto</h1>
+        <a href="index.php?action=productos"><button>Volver a productos</button></a>
+        <a href="index.php?action=panel" class="nav-right"><button>Panel de Control</button></a>
+    </nav>
+
+    <?php if (!empty($error)): ?>
+        <p class="mensaje-error"><?= htmlspecialchars($error) ?></p>
+    <?php endif; ?>
+
+    <form action="index.php?action=productos&update=1" method="POST">
+        <input type="hidden" name="id" value="<?= (int)($product['id'] ?? 0) ?>">
+
+        <label for="name">Nombre:</label>
+        <input type="text" name="name" id="name" value="<?= htmlspecialchars($_POST['name'] ?? ($product['nombre'] ?? '')) ?>" required>
+
+        <label for="categoria">Categoría:</label>
+        <?php $catSel = $_POST['categoria'] ?? ($product['categoria'] ?? ''); ?>
+        <select name="categoria" id="categoria" required>
+            <?php foreach (Producto::CATEGORIAS as $clave => $nombre): ?>
+                <option value="<?= $clave ?>" <?= $catSel === $clave ? 'selected' : '' ?>><?= $nombre ?></option>
+            <?php endforeach; ?>
+        </select>
+
+        <label for="description">Descripción:</label>
+        <textarea name="description" id="description" required><?= htmlspecialchars($_POST['description'] ?? ($product['descripcion'] ?? '')) ?></textarea>
+
+        <label for="stock">Stock:</label>
+        <input type="number" name="stock" id="stock" min="0" value="<?= htmlspecialchars($_POST['stock'] ?? ($product['stock'] ?? '')) ?>" required>
+
+        <label for="price">Precio:</label>
+        <input type="number" name="price" id="price" step="0.01" min="0" value="<?= htmlspecialchars($_POST['price'] ?? ($product['precio'] ?? '')) ?>" required>
+
+        <button type="submit">Guardar cambios</button>
+    </form>
+</body>
+</html>

@@ -35,6 +35,10 @@
                 <p>Precio: <?= htmlspecialchars($product['precio']) ?>€</p>
                 <p>Stock: <?= htmlspecialchars($product['stock']) ?></p>
                 <a href="index.php?action=ver&id=<?= $product['id'] ?>"><button type="button" style="background: #5f6368; margin-bottom: 8px;">Ver Detalle</button></a>
+                <?php if (($_SESSION['user_rol'] ?? '') === 'admin'): ?>
+                    <a href="index.php?action=productos&edit=1&id=<?= $product['id'] ?>"><button type="button" style="background: #188038; margin-bottom: 8px;">Editar</button></a>
+                    <a href="index.php?action=productos&delete=<?= $product['id'] ?>" onclick="return confirm('¿Seguro que quieres eliminar este producto?');"><button type="button" style="background: #d93025; margin-bottom: 8px;">Eliminar</button></a>
+                <?php endif; ?>
                 <form action="index.php?c=order&add=1" method="POST" style="margin-top: 10px;">
                     <input type="hidden" name="id" value="<?= $product['id'] ?>">
                     <label for="qty_<?= $product['id'] ?>">Cantidad:</label>
