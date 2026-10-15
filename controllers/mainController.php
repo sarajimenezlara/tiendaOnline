@@ -77,12 +77,25 @@ class MainController {
         }
         if (isset($_GET['delete'])) {
             $this->soloAdmin();
+            $productoId = (int)$_GET['delete'];
             try {
-                $this->productRepo->delete((int)$_GET['delete']);
+                // Eliminar primero las líneas de pedido que referencian al producto
+                $lineasAfectadas = $this->orderLineRepo->getByProducto($productoId);
+                $pedidosAfectados = [];
+                foreach ($lineasAfectadas as $linea) {
+                    $pedidosAfectados[$linea->getPedidoId()] = true;
+                }
+                $this->orderLineRepo->deleteByProducto($productoId);
+                $this->productRepo->delete($productoId);
+                // Recalcular totales de los pedidos afectados
+                foreach (array_keys($pedidosAfectados) as $pedidoId) {
+                    $nuevoTotal = $this->orderLineRepo->calcTotal($pedidoId);
+                    $this->orderRepo->updateTotal($pedidoId, $nuevoTotal);
+                }
+                header('Location: index.php?action=productos&ok=eliminado');
             } catch (\Throwable $e) {
-                // Si tiene pedidos asociados no se puede borrar
+                header('Location: index.php?action=productos&error=noeliminar');
             }
-            header('Location: index.php?action=productos');
             exit();
         }
         if (isset($_GET['update'])) {
