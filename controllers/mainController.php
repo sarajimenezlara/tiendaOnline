@@ -53,11 +53,15 @@ class MainController {
         }
         if (isset($_GET['add'])) {
             $this->soloAdmin();
+            if (!array_key_exists($_POST['categoria'] ?? '', Producto::CATEGORIAS)) {
+                echo "Categoría no válida.";
+                exit();
+            }
             if (isset($_POST['name']) && isset($_POST['description']) && isset($_POST['stock']) && isset($_POST['price'])) {
                 $producto = new Producto(
                     0,
                     $_POST['name'],
-                    $_POST['categoria'] ?? 'General',
+                    $_POST['categoria'],
                     (int)$_POST['stock'],
                     (float)$_POST['price'],
                     $_POST['description']
@@ -70,7 +74,13 @@ class MainController {
                 exit();
             }
         }
-        $products = $this->productRepo->getAll();
+        $categoria = $_GET['categoria'] ?? null;
+        if ($categoria && array_key_exists($categoria, Producto::CATEGORIAS)) {
+            $products = $this->productRepo->getByCategoria($categoria);
+        } else {
+            $categoria = null; // "Ver todo"
+            $products = $this->productRepo->getAll();
+        }
         require_once 'views/productosView.phtml';
     }
 
