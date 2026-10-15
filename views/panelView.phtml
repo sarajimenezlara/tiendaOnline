@@ -1,0 +1,75 @@
+<?php
+if (!isset($_SESSION['user_id']) || ($_SESSION['user_rol'] ?? '') !== 'admin') {
+    header('Location: index.php?action=index');
+    exit();
+}
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav>
+        <h1>Panel de Control</h1>
+        <?php if (isset($_SESSION['user_nombre'])): ?>
+            <span>Hola, <?= htmlspecialchars($_SESSION['user_nombre']) ?> (admin)</span>
+            <a href="index.php?action=logout"><button>Logout</button></a>
+        <?php endif; ?>
+        <a href="index.php?action=index" class="nav-right"><button>Inicio</button></a>
+        <a href="index.php?c=order&show=1" class="nav-right"><button>Ver Carrito</button></a>
+    </nav>
+
+    <h2>Acciones de administración</h2>
+    <p>
+        <a href="index.php?action=productos&new=1"><button>Nuevo producto</button></a>
+        <a href="index.php?action=productos"><button>Ver productos</button></a>
+    </p>
+
+    <h2>Pedidos de los usuarios</h2>
+    <?php if (empty($pedidos)): ?>
+        <p>No hay pedidos registrados.</p>
+    <?php else: ?>
+        <table class="pedidos-table">
+            <thead>
+                <tr>
+                    <th>ID pedido</th>
+                    <th>Usuario</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($pedidos as $pedido): ?>
+                <?php $usuario = $userRepo->getById($pedido->getUserId()); ?>
+                <?php $lineas = $orderLineRepo->getByPedido($pedido->getId()); ?>
+                <tr>
+                    <td><?= $pedido->getId() ?></td>
+                    <td><?= htmlspecialchars($usuario ? $usuario->getNombre() : ('Usuario #' . $pedido->getUserId())) ?></td>
+                    <td><?= htmlspecialchars($pedido->getFecha()->format('Y-m-d H:i:s')) ?></td>
+                    <td><?= htmlspecialchars($pedido->getEstado()) ?></td>
+                    <td class="total"><?= number_format($pedido->getPrecioTotal(), 2) ?>€</td>
+                    <td class="detalle">
+                        <?php if (empty($lineas)): ?>
+                            Sin líneas
+                        <?php else: ?>
+                            <?php foreach ($lineas as $linea): ?>
+                                <?php $prod = $productRepo->getById($linea->getProductoId()); ?>
+                                <?= htmlspecialchars($prod ? $prod->getNombre() : ('Producto #' . $linea->getProductoId())) ?>
+                                (x<?= $linea->getCantidad() ?>) -
+                                <?= number_format($linea->getSubtotal(), 2) ?>€<br>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+</body>
+</html>

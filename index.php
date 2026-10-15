@@ -36,6 +36,9 @@ switch ($action) {
     case 'productos':
         $controller->productos();
         break;
+    case 'panel':
+        $controller->panel();
+        break;
     case 'ver':
         $controller->verProducto($_GET['id']);
         break;

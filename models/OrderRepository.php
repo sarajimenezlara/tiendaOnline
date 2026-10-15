@@ -52,7 +52,7 @@ class OrderRepository
     public function getAll(): array
     {
         $conn = db::connect();
-        $result = $conn->query('SELECT * FROM pedido ORDER BY fecha DESC');
+        $result = $conn->query('SELECT * FROM pedido ORDER BY id ASC');
         $pedidos = [];
         if ($result) {
             while ($row = $result->fetch_assoc()) {
