@@ -63,7 +63,7 @@ class UserRepository
     }
 
     /**
-     * Compatibilidad con userController.php: busca por nombre o correo
+     * Usado en login y registro: busca por nombre o correo
      * y devuelve array con claves 'id' y 'password' (alias de 'contraseña').
      */
     public function getUserByUsername(string $username): ?array
@@ -79,7 +79,7 @@ class UserRepository
         if (!$row) {
             return null;
         }
-        // Aliases para el controlador antiguo
+        // Aliases usados por MainController
         $row['password'] = $row['contraseña'];
         $row['username'] = $row['nombre'];
         return $row;

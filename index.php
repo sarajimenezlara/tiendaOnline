@@ -40,13 +40,13 @@ switch ($action) {
         $controller->panel();
         break;
     case 'ver':
-        $controller->verProducto($_GET['id']);
+        $controller->verProducto($_GET['id'] ?? 0);
         break;
     case 'comprar':
         $controller->comprar();
         break;
     case 'confirmacion':
-        $controller->confirmacion($_GET['id']);
+        $controller->confirmacion($_GET['id'] ?? 0);
         break;
     default:
         $controller->index();

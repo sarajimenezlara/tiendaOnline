@@ -8,26 +8,46 @@ if (($_SESSION['user_rol'] ?? '') !== 'admin') {
     exit();
 }
 ?>
-<link rel="stylesheet" href="css/styles.css">
-<form action="index.php?action=productos&add=1" method="POST">
-    <label for="name">Nombre:</label>
-    <input type="text" name="name" id="name" required>
-    
-    <label for="categoria">Categoría:</label>
-    <select name="categoria" id="categoria" required>
-        <?php foreach (Producto::CATEGORIAS as $clave => $nombre): ?>
-            <option value="<?= $clave ?>"><?= $nombre ?></option>
-        <?php endforeach; ?>
-    </select>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Producto</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav>
+        <h1>Nuevo Producto</h1>
+        <a href="index.php?action=productos"><button>Volver a productos</button></a>
+        <a href="index.php?action=panel" class="nav-right"><button>Panel de Control</button></a>
+    </nav>
 
-    <label for="description">Descripción:</label>
-    <textarea name="description" id="description" required></textarea>
-    
-    <label for="stock">Stock:</label>
-    <input type="number" name="stock" id="stock" required>
-    
-    <label for="price">Precio:</label>
-    <input type="number" name="price" id="price" step="0.01" required>
-    
-    <button type="submit">Agregar Producto</button>
-</form>
+    <?php if (!empty($error)): ?>
+        <p class="mensaje-error"><?= htmlspecialchars($error) ?></p>
+    <?php endif; ?>
+
+    <form action="index.php?action=productos&add=1" method="POST">
+        <label for="name">Nombre:</label>
+        <input type="text" name="name" id="name" value="<?= htmlspecialchars($_POST['name'] ?? '') ?>" required>
+
+        <label for="categoria">Categoría:</label>
+        <select name="categoria" id="categoria" required>
+            <?php foreach (Producto::CATEGORIAS as $clave => $nombre): ?>
+                <option value="<?= $clave ?>" <?= ($_POST['categoria'] ?? '') === $clave ? 'selected' : '' ?>><?= $nombre ?></option>
+            <?php endforeach; ?>
+        </select>
+
+        <label for="description">Descripción:</label>
+        <textarea name="description" id="description" required><?= htmlspecialchars($_POST['description'] ?? '') ?></textarea>
+
+        <label for="stock">Stock:</label>
+        <input type="number" name="stock" id="stock" min="0" value="<?= htmlspecialchars($_POST['stock'] ?? '') ?>" required>
+
+        <label for="price">Precio:</label>
+        <input type="number" name="price" id="price" step="0.01" min="0" value="<?= htmlspecialchars($_POST['price'] ?? '') ?>" required>
+
+        <button type="submit">Agregar Producto</button>
+    </form>
+</body>
+</html>

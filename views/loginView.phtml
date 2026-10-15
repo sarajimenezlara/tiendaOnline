@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="es">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,12 @@
     </head>
     <body>
         <h1>Login</h1>
+        <?php if (!empty($error)): ?>
+            <p class="mensaje-error"><?= htmlspecialchars($error) ?></p>
+        <?php endif; ?>
         <form method="POST" action="index.php?action=login"> 
             <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" required>
+            <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars($_POST['nombre'] ?? '') ?>" required>
             <br>
             <br>
             <label for="contraseña">Contraseña:</label>
@@ -18,5 +22,6 @@
             <br>
             <input type="submit" value="Iniciar sesión">
         </form>
+        <p>¿No tienes cuenta? <a href="index.php?action=register">Regístrate</a> · <a href="index.php">Volver al inicio</a></p>
     </body>
 </html>
