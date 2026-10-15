@@ -27,6 +27,11 @@
             <div class="productos-center-container">
                 <h2>Productos disponibles:</h2>
                 <a href="index.php?action=productos&view=1"><button class="btn-large">Ver Productos</button></a>
+                <div class="categorias">
+                    <?php foreach (Producto::CATEGORIAS as $clave => $nombre): ?>
+                        <a href="index.php?action=productos&categoria=<?= $clave ?>"><button><?= $nombre ?></button></a>
+                    <?php endforeach; ?>
+                </div>
             </div>
         <?php endif; ?>
     </body>

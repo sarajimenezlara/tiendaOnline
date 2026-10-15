@@ -20,7 +20,11 @@
     <?php if ($product): ?>
         <div>
             <h2><?= htmlspecialchars($product->getNombre()) ?></h2>
-            <p><strong>Categoría:</strong> <?= htmlspecialchars($product->getCategoria()) ?></p>
+            <p><strong>Categoría:</strong>
+                <a href="index.php?action=productos&categoria=<?= htmlspecialchars($product->getCategoria()) ?>">
+                    <?= htmlspecialchars(Producto::CATEGORIAS[$product->getCategoria()] ?? $product->getCategoria()) ?>
+                </a>
+            </p>
             <p><strong>Descripción:</strong> <?= htmlspecialchars($product->getDescripcion() ?? 'Sin descripción') ?></p>
             <p><strong>Precio:</strong> <?= number_format($product->getPrecio(), 2) ?>€</p>
             <p><strong>Stock disponible:</strong> <?= $product->getStock() ?></p>

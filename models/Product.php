@@ -1,6 +1,13 @@
 <?php
 class Producto implements ArrayAccess
 {
+    public const CATEGORIAS = [
+        'alimentacion' => 'Alimentación',
+        'tecnologia'   => 'Tecnología',
+        'accesorios'   => 'Accesorios',
+        'deporte'      => 'Deporte',
+    ];
+
     private int $id;
     private string $nombre;
     private string $categoria;
