@@ -1,0 +1,66 @@
+<?php
+if (($_SESSION['user_rol'] ?? '') !== 'admin') {
+    header('Location: index.php?action=index');
+    exit();
+}
+$mensajesOk = [
+    'creado'    => 'Producto creado correctamente.',
+    'editado'   => 'Producto editado correctamente.',
+    'eliminado' => 'Producto eliminado correctamente.',
+];
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Productos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav>
+        <h1>Gestión de Productos</h1>
+        <a href="index.php?action=panel"><button>Volver</button></a>
+        <a href="index.php?action=productos&new=1"><button>Nuevo producto</button></a>
+    </nav>
+
+    <?php if (isset($mensajesOk[$_GET['ok'] ?? ''])): ?>
+        <p class="mensaje-ok"><?= $mensajesOk[$_GET['ok']] ?></p>
+    <?php endif; ?>
+    <?php if (isset($_GET['error'])): ?>
+        <p class="mensaje-error">No se pudo eliminar el producto.</p>
+    <?php endif; ?>
+
+    <?php if (empty($products)): ?>
+        <p>No hay productos.</p>
+    <?php else: ?>
+        <table class="pedidos-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($products as $product): ?>
+                <tr>
+                    <td><?= $product->getId() ?></td>
+                    <td><?= htmlspecialchars($product->getNombre()) ?></td>
+                    <td><?= htmlspecialchars(Producto::CATEGORIAS[$product->getCategoria()] ?? $product->getCategoria()) ?></td>
+                    <td><?= number_format($product->getPrecio(), 2) ?>€</td>
+                    <td><?= $product->getStock() ?></td>
+                    <td>
+                        <a href="index.php?action=productos&edit=1&id=<?= $product->getId() ?>"><button type="button" style="background: #188038;">Editar</button></a>
+                        <a href="index.php?action=productos&delete=<?= $product->getId() ?>" onclick="return confirm('¿Seguro que quieres eliminar este producto?');"><button type="button" style="background: #d93025;">Eliminar</button></a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+</body>
+</html>
