@@ -20,9 +20,17 @@
 
     <?php if ($pedido): ?>
         <div>
-            <h3>¡Gracias por tu pedido #<?= $pedido->getId() ?>!</h3>
+            <?php if ($pedido->getEstado() === 'completado'): ?>
+                <p class="mensaje-ok">¡Pedido completado con éxito! Gracias por tu compra.</p>
+            <?php endif; ?>
+            <h3>Pedido #<?= $pedido->getId() ?></h3>
             <p><strong>Estado:</strong> <?= htmlspecialchars($pedido->getEstado()) ?></p>
             <p><strong>Fecha:</strong> <?= $pedido->getFecha()->format('d/m/Y H:i') ?></p>
+            <?php foreach ($lineas as $linea): ?>
+                <?php $prod = $productRepo->getById($linea->getProductoId()); ?>
+                <p><?= htmlspecialchars($prod ? $prod->getNombre() : 'Producto #' . $linea->getProductoId()) ?>
+                    (x<?= $linea->getCantidad() ?>) - <?= number_format($linea->getSubtotal(), 2) ?>€</p>
+            <?php endforeach; ?>
             <p><strong>Total:</strong> <?= number_format($pedido->getPrecioTotal(), 2) ?>€</p>
         </div>
     <?php else: ?>

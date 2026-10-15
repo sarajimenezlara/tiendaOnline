@@ -13,15 +13,14 @@
             <span>Hola, <?= htmlspecialchars($_SESSION['user_nombre']) ?></span>
             <a href="index.php?action=logout"><button>Logout</button></a>
         <?php endif; ?>
+        <a href="index.php?action=index"><button>Inicio</button></a>
         <a href="index.php?action=productos&view=1" class="nav-right"><button>Ver Productos</button></a>
     </nav>
 
     <h2>Tu Carrito de la Compra</h2>
 
-    <?php if (isset($_GET['success'])): ?>
-        <div style="background: #e6f4ea; border: 1px solid #34a853; padding: 10px; border-radius: 6px; margin-bottom: 12px;">
-            <p style="color: #137333; margin: 0; font-weight: bold;">¡Pedido completado con éxito! Gracias por tu compra.</p>
-        </div>
+    <?php if (($_GET['error'] ?? '') === 'stock'): ?>
+        <p class="mensaje-error">No hay stock suficiente de ese producto para la cantidad que has pedido.</p>
     <?php endif; ?>
 
     <?php if (empty($lineas)): ?>

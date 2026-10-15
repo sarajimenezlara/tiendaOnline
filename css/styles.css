@@ -148,3 +148,24 @@ body > div p { margin: 4px 0; }
     background: #333;
     color: #fff;
 }
+
+/* Mensajes de error y de éxito */
+.mensaje-error,
+.mensaje-ok {
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-weight: bold;
+}
+
+.mensaje-error {
+    background: #fce8e6;
+    border: 1px solid #d93025;
+    color: #a50e0e;
+}
+
+.mensaje-ok {
+    background: #e6f4ea;
+    border: 1px solid #34a853;
+    color: #137333;
+}
